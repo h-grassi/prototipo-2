@@ -1,0 +1,128 @@
+'use client'
+import { FormEvent, useState } from "react"
+import { useSignUp } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";// rever "next/router" ou "next/compat/router"
+import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
+import { toast } from "sonner";
+import EmailVerifica from "./EmailVerifica";
+export default function SignUpForm(){
+    const router = useRouter();
+    const[username, setusername] = useState("");
+    const[email, setEmail] = useState("");
+    const[emailVerifica, setEmailVerifica] = useState(false);
+    const[password, setPassword] = useState("");
+    const {isLoaded, signUp, setActive} = useSignUp();
+
+    if(!isLoaded){
+      return null;
+    }
+    const handlerSubmit = async(e: FormEvent<HTMLFormElement>) =>{
+      e.preventDefault();
+      try{
+        await signUp.create({
+        emailAddress: email, username, password
+      })
+      await signUp.prepareEmailAddressVerification({
+        strategy: 'email_code',
+      })
+      setEmailVerifica(true);
+
+      }catch(err){
+        if(isClerkAPIResponseError(err)){
+        toast.error(err.errors[0]?.message)
+        }else{
+        console.error(err)
+        toast.error("Algo deu errado.")
+        }
+      }  
+    }
+    if(emailVerifica){
+        return <EmailVerifica/>
+    }
+
+    return(
+        <>
+      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+            Crie sua conta
+          </h2>
+        </div>
+
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form onSubmit={handlerSubmit}>
+            <div>
+              <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+                Email address
+              </label>
+              <div className="mt-2">
+                <input
+                  value={email}
+                  onChange={(e)=> setEmail(e.target.value)}
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
+                Nome de usuário
+              </label>
+              <div className="mt-2">
+                <input
+                  value={username}
+                  onChange={(e)=> setusername(e.target.value)}
+                  id="username"
+                  name="username"
+                  type="username"
+                  required
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                  Password
+                </label>
+              </div>
+              <div className="mt-2">
+                <input
+                  value={password}
+                  onChange={(e)=> setPassword(e.target.value)}
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+            </div>
+            <div id="clerk-captcha" />
+            <div>
+              <button
+                type="submit"
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Sign up
+              </button>
+            </div>
+            <div>
+                <p>Já tem uma conta? <a href="/login"> Faça seu login</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+    )
+}
+/* 
+Ao final do processo usuário é crriado normalmente e login é realizado com sucesso
+mas ocorre erro ao redirecionar o usuário para a página principal.
+Erro necessita ser corrido mas não é uma prioridade já que inicialmente não será liberada a criação de cadastros.
+*/
