@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ngrok": "ngrok http https://localhost:3000"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.2",
@@ -24,6 +25,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.0-dev.20250513"
   }
 }

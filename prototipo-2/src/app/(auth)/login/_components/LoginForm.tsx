@@ -5,18 +5,21 @@ import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";// rever "next/router" ou "next/compat/router"
 import { isClerkAPIResponseError } from "@clerk/nextjs/errors";
 import { toast } from "sonner";
+import LoaderSpinner from "@/componentes/LoaderSpinner";
 
 // essa pasta é um exemplo
 export default function LoginForm(){
     const router = useRouter();
     const[email, setEmail] = useState("");
     const[password, setPassword] = useState("");
+    const[isLoading, setIsLoading] = useState(false);
     const {isLoaded, signIn, setActive} = useSignIn();
 
     if(!isLoaded){
       return null;
     }
     const handlerSubmit = async(e: FormEvent<HTMLFormElement>) =>{
+      setIsLoading(true)
       e.preventDefault();
       try{
         const resultado = await signIn.create({
@@ -33,6 +36,8 @@ export default function LoginForm(){
         console.error(err)
         toast.error("Algo deu errado.")
         }
+      }finally{
+        setIsLoading(false)
       }
       
     }
@@ -71,8 +76,8 @@ export default function LoginForm(){
                   Password
                 </label>
                 <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
+                  <a href="/reset-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    Esqueceu sua senha? 
                   </a>
                 </div>
               </div>
@@ -95,7 +100,8 @@ export default function LoginForm(){
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
-                Sign in
+                {!isLoading && "Entrar"}
+                {isLoading && <LoaderSpinner/>}
               </button>
             </div>
             <div>
