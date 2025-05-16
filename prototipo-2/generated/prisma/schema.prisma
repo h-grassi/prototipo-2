@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id          Int      @id @default(autoincrement())
+  id_clerk    String   @unique
+  email       String
+  nome        String
+  dataCriacao DateTime @default(now())
+}
+
+model Empresa {
+  id                   Int     @id @default(autoincrement())
+  nome                 String
+  id_regiao            Int
+  id_estado            Int
+  id_cidade            Int
+  telefone             String
+  cnpj                 String?
+  email                String?
+  site                 String?
+  cep                  String?
+  endereco             String
+  complemento_endereco String?
+  numero_endereco      Int?
+}
+
+model Regiao_br {
+  id     Int      @id @default(autoincrement())
+  nome   String
+  Estado Estado[]
+}
+
+model Estado {
+  id          Int       @id @default(autoincrement())
+  id_regiao   Int
+  codigo_ibge Int
+  nome        String
+  uf          String
+  Cidade      Cidade[]
+  Regiao_br   Regiao_br @relation(fields: [id_regiao], references: [id], onUpdate: Restrict, map: "fk_estado_regiao")
+}
+
+model Cidade {
+  id          Int      @id @default(autoincrement())
+  id_estado   Int
+  codigo_ibge Int
+  nome        String
+  Estado      Estado   @relation(fields: [id_estado], references: [id], onUpdate: Restrict, map: "fk_cidade_estado")
+  Bairro      Bairro[]
+}
+
+model Bairro {
+  id          Int    @id @default(autoincrement())
+  id_cidade   Int
+  codigo_ibge Int
+  nome        String
+  Cidade      Cidade @relation(fields: [id_cidade], references: [id], onUpdate: Restrict, map: "fk_bairro_cidade")
+}
+
+model Categoria_servicos {
+  id         Int     @id @default(autoincrement())
+  nome       String
+  observacao String?
+  ativo      Boolean @default(true)
+}
+
+model Servico {
+  id           Int     @id @default(autoincrement())
+  id_categoria Int
+  nome         String
+  observacao   String?
+  ativo        Boolean @default(true)
+}
+
+model Empresa_servicos {
+  id         Int     @id @default(autoincrement())
+  id_servico Int
+  id_empresa Int
+  observacao String?
+}
