@@ -4,7 +4,9 @@ export default function SignUpPage(){
     return(
         <>
             <h5>SignUpPage page</h5>
-            <SignUpForm/>
+            <main>
+                <SignUpForm/>
+            </main>
         </>
     )
 }
